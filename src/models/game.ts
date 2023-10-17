@@ -1,7 +1,8 @@
-import { Angler1 } from './enemies/Angler1';
+import { Angler1 } from './enemies/angler1';
 import { InputHandler } from './inputHandler';
 import { Player } from "./player";
 import { UI } from './ui';
+import { Background } from './view/background';
 
 export class Game {
     width: number;
@@ -22,10 +23,13 @@ export class Game {
     winningScore: number;
     gameTime: number;
     timeLimit: number;
+    speed: number;
+    background: Background;
 
     constructor(width: number, height: number) {
         this.width = width;
         this.height = height;
+        this.background = new Background(this);
         this.player = new Player(this);
         this.input = new InputHandler(this);
         this.ui = new UI(this);
@@ -42,9 +46,15 @@ export class Game {
         this.winningScore = 10;
         this.gameTime = 0;
         this.timeLimit = 50000;
+        this.speed = 1;
     }
     update(deltaTime: number) {
+        // hero
         this.player.update();
+
+        // background
+        this.background.update();
+        this.background.layer4.update();
 
         // game time
         if (!this.gameOver) {
@@ -97,17 +107,20 @@ export class Game {
         }
     }
     draw(context: CanvasRenderingContext2D) {
+        this.background.draw(context);
         this.player.draw(context);
         this.ui.draw(context);
         this.enemies.forEach((enemy) => {
             enemy.draw(context);
         });
+        this.background.layer4.draw(context);
     }
     addEnemy() {
         this.enemies.push(new Angler1(this));
         console.log(this.enemies);
     }
-    checkCollision = (rect1, rect2: Angler1) => (
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    checkCollision = (rect1: any, rect2: Angler1) => (
         rect1.x < rect2.x + rect2.width &&
         rect1.x + rect1.width > rect2.x &&
         rect1.y < rect2.y + rect2.height &&

@@ -16,7 +16,7 @@ function App() {
     let lastTime = 0;
 
     //animation loop
-    function animate(timeStamp: number){
+    function animate(timeStamp: number) {
       const deltaTime = timeStamp - lastTime;
       lastTime = timeStamp;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -31,7 +31,8 @@ function App() {
 
   console.log('App.tsx')
   return (
-    <canvas id="canvas1"></canvas>
+    <>
+    </>
   )
 }
 
