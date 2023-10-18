@@ -25,6 +25,7 @@ export class Game {
     timeLimit: number;
     speed: number;
     background: Background;
+    debug: boolean;
 
     constructor(width: number, height: number) {
         this.width = width;
@@ -47,6 +48,7 @@ export class Game {
         this.gameTime = 0;
         this.timeLimit = 50000;
         this.speed = 1;
+        this.debug = false;
     }
     update(deltaTime: number) {
         // hero

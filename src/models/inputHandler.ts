@@ -13,6 +13,9 @@ export class InputHandler {
                 case e.key === " ":
                     this.game.player.shootTop();
                     break;
+                case e.key === "d":
+                    this.game.debug = !this.game.debug;
+                    break;
                 default:
                     break;
             }
