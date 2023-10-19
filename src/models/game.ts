@@ -1,6 +1,9 @@
+import { Explosion } from './effects/explosion';
+import { SmokeExplosion } from './effects/smokeExplosion';
 import { Angler1 } from './enemies/angler1';
 import { Angler2 } from './enemies/angler2';
 import { Drone } from './enemies/drone';
+import { Enemy } from './enemies/enemy';
 import { HiveWhale } from './enemies/hiveWhale';
 import { LuckyFish } from './enemies/luckyFish';
 import { InputHandler } from './inputHandler';
@@ -20,7 +23,7 @@ export class Game {
     ammoTimer: number;
     ammoInterval: number;
     ui: UI;
-    enemies: Angler1[];
+    enemies: Enemy[];
     enemyInterval: number;
     enemyTimer: number;
     gameOver: boolean;
@@ -32,6 +35,7 @@ export class Game {
     background: Background;
     debug: boolean;
     particles: Particle[];
+    explosions: Explosion[];
 
     constructor(width: number, height: number) {
         this.width = width;
@@ -43,6 +47,7 @@ export class Game {
         this.keys = [];
         this.enemies = [];
         this.particles = [];
+        this.explosions = [];
         this.enemyTimer = 0;
         this.enemyInterval = 1000;
         this.ammo = 20;
@@ -91,11 +96,20 @@ export class Game {
             return !particle.markedForDeletion;
         });
 
+        // explosions
+        this.explosions.forEach((explosion) => {
+            explosion.update(deltaTime);
+        });
+        this.explosions = this.explosions.filter((explosion) => {
+            return !explosion.markedForDeletion;
+        });
+
         // enemies
         this.enemies.forEach((enemy) => {
             enemy.update();
             if (this.checkCollision(this.player, enemy)) {
                 enemy.markedForDeletion = true;
+                this.addExplosion(enemy);
                 for (let i = 0; i < enemy.score; i++) {
                     this.particles.push(new Particle(this, enemy.x + enemy.width * .5, enemy.y + enemy.height * .5));
                 }
@@ -112,6 +126,7 @@ export class Game {
                             this.particles.push(new Particle(this, enemy.x + enemy.width * .5, enemy.y + enemy.height * .5));
                         }
                         enemy.markedForDeletion = true;
+                        this.addExplosion(enemy);
                         if (enemy.type === "hive") {
                             for (let i = 0; i < 5; i++) {
                                 this.enemies.push(new Drone(this, enemy.x + Math.random() * enemy.width, enemy.y + Math.random() * enemy.height * .5));
@@ -145,6 +160,9 @@ export class Game {
         this.enemies.forEach((enemy) => {
             enemy.draw(context);
         });
+        this.explosions.forEach((explosion) => {
+            explosion.draw(context);
+        });
         this.background.layer4.draw(context);
     }
     addEnemy() {
@@ -157,6 +175,12 @@ export class Game {
             this.enemies.push(new HiveWhale(this));
         } else {
             this.enemies.push(new LuckyFish(this));
+        }
+    }
+    addExplosion(enemy: Enemy) {
+        const randomize = Math.random();
+        if (randomize < 1) {
+            this.explosions.push(new SmokeExplosion(this, enemy.x + enemy.width / 2, enemy.y + enemy.height / 2));
         }
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-anyd
