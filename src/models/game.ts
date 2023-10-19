@@ -1,5 +1,8 @@
 import { Angler1 } from './enemies/angler1';
+import { Angler2 } from './enemies/angler2';
+import { LuckyFish } from './enemies/luckyFish';
 import { InputHandler } from './inputHandler';
+import { Particle } from './particle';
 import { Player } from "./player";
 import { UI } from './ui';
 import { Background } from './view/background';
@@ -26,6 +29,7 @@ export class Game {
     speed: number;
     background: Background;
     debug: boolean;
+    particles: Particle[];
 
     constructor(width: number, height: number) {
         this.width = width;
@@ -36,6 +40,7 @@ export class Game {
         this.ui = new UI(this);
         this.keys = [];
         this.enemies = [];
+        this.particles = [];
         this.enemyTimer = 0;
         this.enemyInterval = 1000;
         this.ammo = 20;
@@ -52,7 +57,7 @@ export class Game {
     }
     update(deltaTime: number) {
         // hero
-        this.player.update();
+        this.player.update(deltaTime);
 
         // background
         this.background.update();
@@ -76,17 +81,34 @@ export class Game {
             this.ammoTimer += deltaTime;
         }
 
+        // particles
+        this.particles.forEach((particle) => {
+            particle.update();
+        });
+        this.particles = this.particles.filter((particle) => {
+            return !particle.markedForDeletion;
+        });
+
         // enemies
         this.enemies.forEach((enemy) => {
             enemy.update();
             if (this.checkCollision(this.player, enemy)) {
                 enemy.markedForDeletion = true;
+                for (let i = 0; i < 10; i++) {
+                    this.particles.push(new Particle(this, enemy.x + enemy.width * .5, enemy.y + enemy.height * .5));
+                }
+                if (enemy.type === "lucky") this.player.enterPowerUp();
+                else this.score--;
             }
             this.player.projectiles.forEach((projectile) => {
                 if (this.checkCollision(projectile, enemy)) {
                     enemy.lives--;
                     projectile.markedForDeletion = true;
+                    this.particles.push(new Particle(this, enemy.x + enemy.width * .5, enemy.y + enemy.height * .5));
                     if (enemy.lives <= 0) {
+                        for (let i = 0; i < 10; i++) {
+                            this.particles.push(new Particle(this, enemy.x + enemy.width * .5, enemy.y + enemy.height * .5));
+                        }
                         enemy.markedForDeletion = true;
                         if (!this.gameOver) {
                             this.score += enemy.score;
@@ -112,16 +134,24 @@ export class Game {
         this.background.draw(context);
         this.player.draw(context);
         this.ui.draw(context);
+        this.particles.forEach((particle) => particle.draw(context));
         this.enemies.forEach((enemy) => {
             enemy.draw(context);
         });
         this.background.layer4.draw(context);
     }
     addEnemy() {
-        this.enemies.push(new Angler1(this));
+        const randomize = Math.random();
+        if (randomize < 0.3) {
+            this.enemies.push(new Angler1(this));
+        } else if (randomize < 0.6) {
+            this.enemies.push(new Angler2(this));
+        } else {
+            this.enemies.push(new LuckyFish(this));
+        }
         console.log(this.enemies);
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-anyd
     checkCollision = (rect1: any, rect2: Angler1) => (
         rect1.x < rect2.x + rect2.width &&
         rect1.x + rect1.width > rect2.x &&

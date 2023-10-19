@@ -14,6 +14,9 @@ export class Player {
     frameX: number;
     frameY: number;
     maxFrame: number;
+    powerUp: boolean;
+    powerUpTimer: number;
+    powerUpLimit: number;
     constructor(game: Game) {
         this.game = game;
         this.width = 120;
@@ -27,6 +30,9 @@ export class Player {
         this.maxSpeed = 2;
         this.projectiles = [];
         this.image = document.getElementById('player') as HTMLImageElement;
+        this.powerUp = false;
+        this.powerUpTimer = 0;
+        this.powerUpLimit = 10000;
     }
 
     updateSpeed = (keys: string[]) => {
@@ -43,12 +49,16 @@ export class Player {
         }
     }
 
-    update() {
+    update(deltaTime: number) {
         const { keys } = this.game;
 
         this.updateSpeed(keys);
 
         this.y += this.speedY;
+
+        // vertical boundaries
+        if (this.y > this.game.height - this.height * .5) this.y = this.game.height - this.height * .5;
+        else if (this.y < -this.height * .5) this.y = -this.height * .5;
 
         //handle projectiles
         this.projectiles.forEach(projectile => {
@@ -60,15 +70,30 @@ export class Player {
         //sprite animation
         if (this.frameX < this.maxFrame) this.frameX++;
         else this.frameX = 0;
+
+        // power up
+        if (this.powerUp) {
+            if (this.powerUpTimer > this.powerUpLimit) {
+                this.powerUp = false;
+                this.powerUpTimer = 0;
+                this.frameY = 0;
+            } else {
+                this.powerUpTimer += deltaTime;
+                this.frameY = 1;
+                this.game.ammo += 0.1;
+            }
+        }
     }
 
     draw(context: CanvasRenderingContext2D) {
         if (this.game.debug) context.strokeRect(this.x, this.y, this.width, this.height);
-        context.drawImage(this.image, this.frameX * this.width, this.frameY * this.height, this.width, this.height, this.x, this.y, this.width, this.height);
+
         // draw projectiles
         this.projectiles.forEach(projectile => {
             projectile.draw(context);
         });
+
+        context.drawImage(this.image, this.frameX * this.width, this.frameY * this.height, this.width, this.height, this.x, this.y, this.width, this.height);
     }
 
     shootTop() {
@@ -77,6 +102,21 @@ export class Player {
             this.projectiles.push(projectile);
             this.game.ammo--;
         }
+        if (this.powerUp) this.shootBottom();
+    }
+
+    shootBottom() {
+        if (this.game.ammo > 0) {
+            const projectile = new Projectile(this.game, this.x + 80, this.y + 175);
+            this.projectiles.push(projectile);
+            this.game.ammo--;
+        }
+    }
+
+    enterPowerUp() {
+        this.powerUpTimer = 0;
+        this.powerUp = true;
+        this.game.ammo = this.game.maxAmmo;
     }
 }
 

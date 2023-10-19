@@ -7,8 +7,9 @@ export abstract class Enemy {
     width: number = 0;
     height: number = 0;
     y: number = 0;
-    lives: number;
-    score: number;
+    lives: number = 0;
+    score: number = 0;
+    type: string = "";
     frameY: number;
     abstract image: HTMLImageElement;
     maxFrame: number;
@@ -19,8 +20,6 @@ export abstract class Enemy {
         this.x = this.game.width;
         this.speedX = Math.random() * -1.5 - 0.5;
         this.markedForDeletion = false;
-        this.lives = 5;
-        this.score = this.lives;
         this.frameX = 0;
         this.frameY = 0;
         this.maxFrame = 37;
@@ -37,7 +36,9 @@ export abstract class Enemy {
     draw(context: CanvasRenderingContext2D) {
         if (this.game.debug) context.strokeRect(this.x, this.y, this.width, this.height);
         context.drawImage(this.image, this.frameX * this.width, this.frameY * this.height, this.width, this.height, this.x, this.y, this.width, this.height);
-        context.font = "30px Helvetica";
-        context.fillText(this.lives.toString(), this.x, this.y);
+        if (this.game.debug) {
+            context.font = "30px Helvetica";
+            context.fillText(this.lives.toString(), this.x, this.y);
+        }
     }
 }

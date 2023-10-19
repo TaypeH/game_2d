@@ -1,6 +1,6 @@
 import { Game } from "./game";
 
-export class Projectile{
+export class Projectile {
     game: Game;
     x: number;
     y: number;
@@ -8,7 +8,8 @@ export class Projectile{
     height: number;
     speed: number;
     markedForDeletion: boolean;
-    constructor(game: Game, x: number, y: number){
+    image: HTMLImageElement;
+    constructor(game: Game, x: number, y: number) {
         this.game = game;
         this.x = x;
         this.y = y;
@@ -16,17 +17,17 @@ export class Projectile{
         this.height = 3;
         this.speed = 3;
         this.markedForDeletion = false;
+        this.image = document.getElementById("projectile") as HTMLImageElement;
     }
 
-    update(){
+    update() {
         this.x += this.speed;
-        if(this.x > this.game.width * 0.8){
+        if (this.x > this.game.width * 0.8) {
             this.markedForDeletion = true;
         }
     }
-    
-    draw(context: CanvasRenderingContext2D){
-        context.fillStyle = "yellow";
-        context.fillRect(this.x, this.y, this.width, this.height);
+
+    draw(context: CanvasRenderingContext2D) {
+        context.drawImage(this.image, this.x, this.y);
     }
 }
