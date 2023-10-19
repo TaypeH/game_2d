@@ -1,5 +1,7 @@
 import { Angler1 } from './enemies/angler1';
 import { Angler2 } from './enemies/angler2';
+import { Drone } from './enemies/drone';
+import { HiveWhale } from './enemies/hiveWhale';
 import { LuckyFish } from './enemies/luckyFish';
 import { InputHandler } from './inputHandler';
 import { Particle } from './particle';
@@ -94,7 +96,7 @@ export class Game {
             enemy.update();
             if (this.checkCollision(this.player, enemy)) {
                 enemy.markedForDeletion = true;
-                for (let i = 0; i < 10; i++) {
+                for (let i = 0; i < enemy.score; i++) {
                     this.particles.push(new Particle(this, enemy.x + enemy.width * .5, enemy.y + enemy.height * .5));
                 }
                 if (enemy.type === "lucky") this.player.enterPowerUp();
@@ -106,10 +108,15 @@ export class Game {
                     projectile.markedForDeletion = true;
                     this.particles.push(new Particle(this, enemy.x + enemy.width * .5, enemy.y + enemy.height * .5));
                     if (enemy.lives <= 0) {
-                        for (let i = 0; i < 10; i++) {
+                        for (let i = 0; i < enemy.score; i++) {
                             this.particles.push(new Particle(this, enemy.x + enemy.width * .5, enemy.y + enemy.height * .5));
                         }
                         enemy.markedForDeletion = true;
+                        if (enemy.type === "hive") {
+                            for (let i = 0; i < 5; i++) {
+                                this.enemies.push(new Drone(this, enemy.x + Math.random() * enemy.width, enemy.y + Math.random() * enemy.height * .5));
+                            }
+                        }
                         if (!this.gameOver) {
                             this.score += enemy.score;
                         }
@@ -132,8 +139,8 @@ export class Game {
     }
     draw(context: CanvasRenderingContext2D) {
         this.background.draw(context);
-        this.player.draw(context);
         this.ui.draw(context);
+        this.player.draw(context);
         this.particles.forEach((particle) => particle.draw(context));
         this.enemies.forEach((enemy) => {
             enemy.draw(context);
@@ -146,10 +153,11 @@ export class Game {
             this.enemies.push(new Angler1(this));
         } else if (randomize < 0.6) {
             this.enemies.push(new Angler2(this));
+        } else if (randomize < 0.8) {
+            this.enemies.push(new HiveWhale(this));
         } else {
             this.enemies.push(new LuckyFish(this));
         }
-        console.log(this.enemies);
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-anyd
     checkCollision = (rect1: any, rect2: Angler1) => (

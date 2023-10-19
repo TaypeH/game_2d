@@ -9,7 +9,7 @@ export class LuckyFish extends Enemy {
         super(game);
         this.width = 99;
         this.height = 95;
-        this.y = Math.random() * (this.game.height * 0.9 - this.height);
+        this.y = Math.random() * (this.game.height * 0.95 - this.height);
         this.image = document.getElementById("lucky") as HTMLImageElement;
         this.frameY = Math.floor(Math.random() * 2);
         this.lives = 3;
