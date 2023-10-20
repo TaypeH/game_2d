@@ -14,6 +14,10 @@ import { Player } from "./player";
 import { UI } from './ui';
 import { Background } from './view/background';
 import { MoonFish } from './enemies/fish/moonFish';
+import { SoundController } from './sound/soundController';
+import { Shield } from './shield';
+import { Stalker } from './enemies/fish/stalker';
+import { RazorFin } from './enemies/fish/razorfin';
 
 export class Game {
     width: number;
@@ -39,6 +43,8 @@ export class Game {
     debug: boolean;
     particles: Particle[];
     explosions: Explosion[];
+    sound: SoundController;
+    shield: Shield;
 
     constructor(width: number, height: number) {
         this.width = width;
@@ -47,6 +53,8 @@ export class Game {
         this.player = new Player(this);
         this.input = new InputHandler(this);
         this.ui = new UI(this);
+        this.sound = new SoundController();
+        this.shield = new Shield(this);
         this.keys = [];
         this.enemies = [];
         this.particles = [];
@@ -91,6 +99,9 @@ export class Game {
             this.ammoTimer += deltaTime;
         }
 
+        // shield
+        this.shield.update(deltaTime);
+
         // particles
         this.particles.forEach((particle) => {
             particle.update();
@@ -113,6 +124,8 @@ export class Game {
             if (this.checkCollision(this.player, enemy)) {
                 enemy.markedForDeletion = true;
                 this.addExplosion(enemy);
+                this.sound.hit()
+                this.shield.reset();
                 for (let i = 0; i < enemy.score; i++) {
                     this.particles.push(new Particle(this, enemy.x + enemy.width * .5, enemy.y + enemy.height * .5));
                 }
@@ -130,6 +143,7 @@ export class Game {
                         }
                         enemy.markedForDeletion = true;
                         this.addExplosion(enemy);
+                        this.sound.explosion();
                         if(enemy.type === "moon") this.player.enterPowerUp();
                         if (enemy.type === "hive") {
                             for (let i = 0; i < 5; i++) {
@@ -160,6 +174,7 @@ export class Game {
         this.background.draw(context);
         this.ui.draw(context);
         this.player.draw(context);
+        this.shield.draw(context);
         this.particles.forEach((particle) => particle.draw(context));
         this.enemies.forEach((enemy) => {
             enemy.draw(context);
@@ -173,8 +188,12 @@ export class Game {
         const randomize = Math.random();
         if (randomize < 0.3) {
             this.enemies.push(new Angler1(this));
-        } else if (randomize < 0.6) {
+        } else if (randomize < 0.4) {
             this.enemies.push(new Angler2(this));
+        } else if (randomize < 0.5) {
+            this.enemies.push(new RazorFin(this));
+        } else if (randomize < 0.6) {
+            this.enemies.push(new Stalker(this));
         } else if (randomize < 0.7) {
             this.enemies.push(new HiveWhale(this));
         } else if (randomize < 0.8) {

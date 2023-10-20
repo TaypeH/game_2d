@@ -62,7 +62,7 @@ export class Player {
 
         //handle projectiles
         this.projectiles.forEach(projectile => {
-            projectile.update();
+            projectile.update(deltaTime);
         });
         //remove projectiles that are marked for deletion
         this.projectiles = this.projectiles.filter(projectile => !projectile.markedForDeletion);
@@ -77,6 +77,7 @@ export class Player {
                 this.powerUp = false;
                 this.powerUpTimer = 0;
                 this.frameY = 0;
+                this.game.sound.powerDown();
             } else {
                 this.powerUpTimer += deltaTime;
                 this.frameY = 1;
@@ -102,6 +103,7 @@ export class Player {
             this.projectiles.push(projectile);
             this.game.ammo--;
         }
+        this.game.sound.shot();
         if (this.powerUp) this.shootBottom();
     }
 
@@ -117,6 +119,7 @@ export class Player {
         this.powerUpTimer = 0;
         this.powerUp = true;
         if (this.game.ammo < this.game.maxAmmo) this.game.ammo = this.game.maxAmmo;
+        this.game.sound.powerUp();
     }
 }
 
