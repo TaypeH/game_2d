@@ -26,9 +26,11 @@
 #lucky,
 #projectile,
 #gears,
-#hivewhale,
+#hiveWhale,
 #drone,
 #smokeExplosion,
-#fireExplosion {
+#fireExplosion,
+#bulbWhale,
+#moonFish {
   display: none;
 }

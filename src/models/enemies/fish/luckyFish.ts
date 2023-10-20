@@ -1,5 +1,5 @@
-import { Game } from "../game";
-import { Enemy } from "./enemy";
+import { Game } from "../../game";
+import { Enemy } from "../enemy";
 
 export class LuckyFish extends Enemy {
     image: HTMLImageElement;
@@ -12,7 +12,7 @@ export class LuckyFish extends Enemy {
         this.y = Math.random() * (this.game.height * 0.95 - this.height);
         this.image = document.getElementById("lucky") as HTMLImageElement;
         this.frameY = Math.floor(Math.random() * 2);
-        this.lives = 3;
+        this.lives = 5;
         this.score = 15;
         this.type ="lucky";
     }

@@ -2,17 +2,17 @@ import { Game } from "../game";
 
 export class Explosion {
     image!: HTMLImageElement;
-    x: number = 0;
-    y: number = 0;
+    x: number;
+    y: number;
     frameX: number;
     spriteHeight: number;
     timer: number;
     interval: number;
     fps: number;
     markedForDeletion: boolean;
-    spriteWidth: number = 0;
-    width: number = 0;
-    height: number = 0;
+    spriteWidth: number;
+    width: number;
+    height: number;
     maxFrame: number;
     game: Game;
 
@@ -25,6 +25,11 @@ export class Explosion {
         this.interval = 1000 / this.fps;
         this.markedForDeletion = false;
         this.maxFrame = 8;
+        this.spriteWidth = 200;
+        this.width = this.spriteWidth;
+        this.height = this.spriteHeight;
+        this.x = x - this.width / 2;
+        this.y = y - this.height / 2;
     }
     update(deltaTime: number) {
         this.x -= this.game.speed;

@@ -1,16 +1,19 @@
 import { Explosion } from './effects/explosion';
+import { FireExplosion } from './effects/fireExplosion';
 import { SmokeExplosion } from './effects/smokeExplosion';
-import { Angler1 } from './enemies/angler1';
-import { Angler2 } from './enemies/angler2';
-import { Drone } from './enemies/drone';
+import { Angler1 } from './enemies/angler/angler1';
+import { Angler2 } from './enemies/angler/angler2';
+import { BulbWhale } from './enemies/whale/bulbWhale';
+import { Drone } from './enemies/whale/drone';
 import { Enemy } from './enemies/enemy';
-import { HiveWhale } from './enemies/hiveWhale';
-import { LuckyFish } from './enemies/luckyFish';
+import { HiveWhale } from './enemies/whale/hiveWhale';
+import { LuckyFish } from './enemies/fish/luckyFish';
 import { InputHandler } from './inputHandler';
 import { Particle } from './particle';
 import { Player } from "./player";
 import { UI } from './ui';
 import { Background } from './view/background';
+import { MoonFish } from './enemies/fish/moonFish';
 
 export class Game {
     width: number;
@@ -49,16 +52,16 @@ export class Game {
         this.particles = [];
         this.explosions = [];
         this.enemyTimer = 0;
-        this.enemyInterval = 1000;
+        this.enemyInterval = 2000;
         this.ammo = 20;
         this.maxAmmo = 50;
         this.ammoTimer = 0;
-        this.ammoInterval = 500;
+        this.ammoInterval = 350;
         this.gameOver = false;
         this.score = 0;
-        this.winningScore = 10;
+        this.winningScore = 80;
         this.gameTime = 0;
-        this.timeLimit = 50000;
+        this.timeLimit = 30000;
         this.speed = 1;
         this.debug = false;
     }
@@ -114,7 +117,7 @@ export class Game {
                     this.particles.push(new Particle(this, enemy.x + enemy.width * .5, enemy.y + enemy.height * .5));
                 }
                 if (enemy.type === "lucky") this.player.enterPowerUp();
-                else this.score--;
+                else if (!this.gameOver) this.score--;
             }
             this.player.projectiles.forEach((projectile) => {
                 if (this.checkCollision(projectile, enemy)) {
@@ -127,6 +130,7 @@ export class Game {
                         }
                         enemy.markedForDeletion = true;
                         this.addExplosion(enemy);
+                        if(enemy.type === "moon") this.player.enterPowerUp();
                         if (enemy.type === "hive") {
                             for (let i = 0; i < 5; i++) {
                                 this.enemies.push(new Drone(this, enemy.x + Math.random() * enemy.width, enemy.y + Math.random() * enemy.height * .5));
@@ -135,9 +139,9 @@ export class Game {
                         if (!this.gameOver) {
                             this.score += enemy.score;
                         }
-                        if (this.score >= this.winningScore) {
-                            this.gameOver = true
-                        }
+                        // if (this.score >= this.winningScore) {
+                        //     this.gameOver = true
+                        // }
                     }
                 }
             });
@@ -171,16 +175,22 @@ export class Game {
             this.enemies.push(new Angler1(this));
         } else if (randomize < 0.6) {
             this.enemies.push(new Angler2(this));
-        } else if (randomize < 0.8) {
+        } else if (randomize < 0.7) {
             this.enemies.push(new HiveWhale(this));
+        } else if (randomize < 0.8) {
+            this.enemies.push(new BulbWhale(this));
+        } else if (randomize < 0.9) {
+            this.enemies.push(new MoonFish(this));
         } else {
             this.enemies.push(new LuckyFish(this));
         }
     }
     addExplosion(enemy: Enemy) {
         const randomize = Math.random();
-        if (randomize < 1) {
+        if (randomize < 0.5) {
             this.explosions.push(new SmokeExplosion(this, enemy.x + enemy.width / 2, enemy.y + enemy.height / 2));
+        } else {
+            this.explosions.push(new FireExplosion(this, enemy.x + enemy.width / 2, enemy.y + enemy.height / 2));
         }
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-anyd

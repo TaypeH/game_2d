@@ -1,5 +1,5 @@
-import { Game } from "../game";
-import { Enemy } from "./enemy";
+import { Game } from "../../game";
+import { Enemy } from "../enemy";
 
 export class Drone extends Enemy {
     image: HTMLImageElement;
