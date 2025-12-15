@@ -1,23 +1,23 @@
-import { Explosion } from './effects/explosion';
-import { FireExplosion } from './effects/fireExplosion';
-import { SmokeExplosion } from './effects/smokeExplosion';
-import { Angler1 } from './enemies/angler/angler1';
-import { Angler2 } from './enemies/angler/angler2';
-import { BulbWhale } from './enemies/whale/bulbWhale';
-import { Drone } from './enemies/whale/drone';
-import { Enemy } from './enemies/enemy';
-import { HiveWhale } from './enemies/whale/hiveWhale';
-import { LuckyFish } from './enemies/fish/luckyFish';
-import { InputHandler } from './inputHandler';
-import { Particle } from './particle';
+import { Explosion } from "./effects/explosion";
+import { FireExplosion } from "./effects/fireExplosion";
+import { SmokeExplosion } from "./effects/smokeExplosion";
+import { Angler1 } from "./enemies/angler/angler1";
+import { Angler2 } from "./enemies/angler/angler2";
+import { BulbWhale } from "./enemies/whale/bulbWhale";
+import { Drone } from "./enemies/whale/drone";
+import { Enemy } from "./enemies/enemy";
+import { HiveWhale } from "./enemies/whale/hiveWhale";
+import { LuckyFish } from "./enemies/fish/luckyFish";
+import { InputHandler } from "./inputHandler";
+import { Particle } from "./particle";
 import { Player } from "./player";
-import { UI } from './ui';
-import { Background } from './view/background';
-import { MoonFish } from './enemies/fish/moonFish';
-import { SoundController } from './sound/soundController';
-import { Shield } from './shield';
-import { Stalker } from './enemies/fish/stalker';
-import { RazorFin } from './enemies/fish/razorfin';
+import { UI } from "./ui";
+import { Background } from "./view/background";
+import { MoonFish } from "./enemies/fish/moonFish";
+import { SoundController } from "./sound/soundController";
+import { Shield } from "./shield";
+import { Stalker } from "./enemies/fish/stalker";
+import { RazorFin } from "./enemies/fish/razorfin";
 
 export class Game {
     width: number;
@@ -124,10 +124,10 @@ export class Game {
             if (this.checkCollision(this.player, enemy)) {
                 enemy.markedForDeletion = true;
                 this.addExplosion(enemy);
-                this.sound.hit()
+                this.sound.hit();
                 this.shield.reset();
                 for (let i = 0; i < enemy.score; i++) {
-                    this.particles.push(new Particle(this, enemy.x + enemy.width * .5, enemy.y + enemy.height * .5));
+                    this.particles.push(new Particle(this, enemy.x + enemy.width * 0.5, enemy.y + enemy.height * 0.5));
                 }
                 if (enemy.type === "lucky") this.player.enterPowerUp();
                 else if (!this.gameOver) this.score--;
@@ -136,18 +136,26 @@ export class Game {
                 if (this.checkCollision(projectile, enemy)) {
                     enemy.lives--;
                     projectile.markedForDeletion = true;
-                    this.particles.push(new Particle(this, enemy.x + enemy.width * .5, enemy.y + enemy.height * .5));
+                    this.particles.push(new Particle(this, enemy.x + enemy.width * 0.5, enemy.y + enemy.height * 0.5));
                     if (enemy.lives <= 0) {
                         for (let i = 0; i < enemy.score; i++) {
-                            this.particles.push(new Particle(this, enemy.x + enemy.width * .5, enemy.y + enemy.height * .5));
+                            this.particles.push(
+                                new Particle(this, enemy.x + enemy.width * 0.5, enemy.y + enemy.height * 0.5)
+                            );
                         }
                         enemy.markedForDeletion = true;
                         this.addExplosion(enemy);
                         this.sound.explosion();
-                        if(enemy.type === "moon") this.player.enterPowerUp();
+                        if (enemy.type === "moon") this.player.enterPowerUp();
                         if (enemy.type === "hive") {
                             for (let i = 0; i < 5; i++) {
-                                this.enemies.push(new Drone(this, enemy.x + Math.random() * enemy.width, enemy.y + Math.random() * enemy.height * .5));
+                                this.enemies.push(
+                                    new Drone(
+                                        this,
+                                        enemy.x + Math.random() * enemy.width,
+                                        enemy.y + Math.random() * enemy.height * 0.5
+                                    )
+                                );
                             }
                         }
                         if (!this.gameOver) {
@@ -213,9 +221,9 @@ export class Game {
         }
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-anyd
-    checkCollision = (rect1: any, rect2: Angler1) => (
+    checkCollision = (rect1: any, rect2: Angler1) =>
         rect1.x < rect2.x + rect2.width &&
         rect1.x + rect1.width > rect2.x &&
         rect1.y < rect2.y + rect2.height &&
-        rect1.height + rect1.y > rect2.y);
+        rect1.height + rect1.y > rect2.y;
 }

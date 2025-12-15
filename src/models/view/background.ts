@@ -12,6 +12,7 @@ export class Background {
     layer2: Layer;
     layer3: Layer;
     layer4: Layer;
+
     constructor(game: Game) {
         this.game = game;
         this.image1 = document.getElementById("layer1") as HTMLImageElement;
@@ -24,9 +25,11 @@ export class Background {
         this.layer4 = new Layer(this.game, this.image4, 1.5);
         this.layers = [this.layer1, this.layer2, this.layer3];
     }
+
     update() {
         this.layers.forEach(layer => { layer.update() });
     }
+
     draw(context: CanvasRenderingContext2D) {
         this.layers.forEach(layer => { layer.draw(context) });
     }
